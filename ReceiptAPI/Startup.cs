@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ReceiptAPI.Services.Implementation;
+using ReceiptAPI.Services.Interface;
 
 namespace ReceiptAPI
 {
@@ -26,6 +28,7 @@ namespace ReceiptAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddScoped<IReceiptService, ReceiptService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
