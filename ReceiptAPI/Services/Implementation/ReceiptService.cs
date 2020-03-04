@@ -1,4 +1,5 @@
-﻿using ReceiptAPI.Models;
+﻿using AutoMapper;
+using ReceiptAPI.Models;
 using ReceiptAPI.Models.Base;
 using ReceiptAPI.Services.Interface;
 using System;
@@ -51,6 +52,13 @@ namespace ReceiptAPI.Services.Implementation
                 }
             },
         };
+
+        private readonly IMapper mapper;
+
+        public ReceiptService(IMapper mapper)
+        {
+            this.mapper = mapper;
+        }
 
         public async Task<ServiceResponse<Receipt>> AddNewReceipt(Receipt receipt)
         {
