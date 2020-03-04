@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using ReceiptAPI.EFContexts;
 using ReceiptAPI.Models;
 using ReceiptAPI.Models.Base;
+using ReceiptAPI.Models.Dtos;
 using ReceiptAPI.Services.Interface;
 using System;
 using System.Collections.Generic;
@@ -11,63 +14,27 @@ namespace ReceiptAPI.Services.Implementation
 {
     public class ReceiptService : IReceiptService
     {
-        private static List<Receipt> receipts = new List<Receipt>
-        {
-            new Receipt
-            {
-                 Id = 1,
-                 Products = new List<Product>
-                {
-                    new Product
-                    {
-                        Id = 1,
-                        Name = "Produkt1",
-                        Value = 5.10m
-                    },
-                    new Product
-                    {
-                        Id = 2,
-                        Name = "Produkt2",
-                        Value = 4.10m
-                    },
-                }
-            },
-            new Receipt
-            {
-                 Id = 2,
-                 Products = new List<Product>
-                {
-                    new Product
-                    {
-                        Id = 3,
-                        Name = "Produkt3",
-                        Value = 2.20m
-                    },
-                    new Product
-                    {
-                        Id = 4,
-                        Name = "Produkt4",
-                        Value = 3m
-                    },
-                }
-            },
-        };
-
         private readonly IMapper mapper;
+        private readonly DataContext context;
 
-        public ReceiptService(IMapper mapper)
+        public ReceiptService(IMapper mapper, DataContext context)
         {
             this.mapper = mapper;
+            this.context = context;
         }
 
-        public async Task<ServiceResponse<Receipt>> AddNewReceipt(Receipt receipt)
+        public async Task<ServiceResponse<ReceiptDto>> AddNewReceipt(ReceiptDto receipt)
         {
-            ServiceResponse<Receipt> response = new ServiceResponse<Receipt>();
-
+            ServiceResponse<ReceiptDto> response = new ServiceResponse<ReceiptDto>();
+                       
             if (receipt != null)
             {
-                receipts.Add(receipt);
-                response.Data = receipt;
+                var receiptDb = mapper.Map<Receipt>(receipt);
+
+                await context.Receipts.AddAsync(receiptDb);
+                await context.SaveChangesAsync();
+
+                response.Data = mapper.Map<ReceiptDto>(await context.Receipts.Include(x => x.Products).FirstOrDefaultAsync(x => x.Id == receiptDb.Id));
                 response.Success = true;
                 response.Message = "OK";
             }
@@ -75,21 +42,23 @@ namespace ReceiptAPI.Services.Implementation
             return response;
         }
 
-        public async Task<ServiceResponse<List<Receipt>>> GetAllReceipts()
+        public async Task<ServiceResponse<List<ReceiptDto>>> GetAllReceipts()
         {
-            ServiceResponse<List<Receipt>> response = new ServiceResponse<List<Receipt>>();
-            response.Data = receipts;
+            ServiceResponse<List<ReceiptDto>> response = new ServiceResponse<List<ReceiptDto>>();
+            var receipts = await context.Receipts.Include(x => x.Products).ToListAsync();
+            response.Data = receipts.Select(x => mapper.Map<ReceiptDto>(x)).ToList();
             response.Success = true;
             response.Message = "OK";
 
             return response;
         }
 
-        public async Task<ServiceResponse<Receipt>> GetReceiptById(int id)
+        public async Task<ServiceResponse<ReceiptDto>> GetReceiptById(int id)
         {
-            ServiceResponse<Receipt> response = new ServiceResponse<Receipt>();
+            ServiceResponse<ReceiptDto> response = new ServiceResponse<ReceiptDto>();
 
-            var receipt = receipts.FirstOrDefault(x => x.Id == id);
+            var receiptDbo = await context.Receipts.Include(x => x.Products).FirstOrDefaultAsync(x => x.Id == id);
+            var receipt = mapper.Map<ReceiptDto>(receiptDbo);
 
             if (receipt != null)
             {

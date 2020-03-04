@@ -1,5 +1,6 @@
 ﻿using ReceiptAPI.Models;
 using ReceiptAPI.Models.Base;
+using ReceiptAPI.Models.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace ReceiptAPI.Services.Interface
 {
     public interface IReceiptService
     {
-        Task<ServiceResponse<List<Receipt>>> GetAllReceipts();
+        Task<ServiceResponse<List<ReceiptDto>>> GetAllReceipts();
 
-        Task<ServiceResponse<Receipt>> GetReceiptById(int id);
+        Task<ServiceResponse<ReceiptDto>> GetReceiptById(int id);
 
-        Task<ServiceResponse<Receipt>> AddNewReceipt(Receipt receipt);
+        Task<ServiceResponse<ReceiptDto>> AddNewReceipt(ReceiptDto receipt);
     }
 }

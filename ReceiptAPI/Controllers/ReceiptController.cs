@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReceiptAPI.Models;
+using ReceiptAPI.Models.Dtos;
 using ReceiptAPI.Services.Interface;
 
 namespace ReceiptAPI.Controllers
@@ -37,7 +38,7 @@ namespace ReceiptAPI.Controllers
         }
 
         [HttpPost]
-        public async Task <IActionResult> Add(Receipt receipt)
+        public async Task<IActionResult> Add(ReceiptDto receipt)
         {
             if (receipt != null)
             {

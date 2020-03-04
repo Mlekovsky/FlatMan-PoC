@@ -10,8 +10,11 @@ namespace ReceiptAPI.Models
         public int Id { get; set; }
         public DateTime ReceiptDate { get; set; }
         public List<Product> Products { get; set; }
-        public decimal TotalValue => Products.Sum(x => x.Value);
+        public decimal TotalValue { get; set; }
 
-        public Receipt() => Products = new List<Product>();
+        public Receipt()
+        {
+            Products = new List<Product>();
+        }
     }
 }
